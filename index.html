@@ -236,6 +236,16 @@ footer p{margin:0;font-size:.92rem;color:var(--ink-soft)}
   var episodes = [
     {
       release: 1,
+      sprint: 2,
+      title: "APIs sem mistério",
+      date: "2026-10-14",
+      duration: "09:14",
+      desc: "O que é uma API, explicado com a analogia do garçom: endpoints, os métodos GET, POST, PUT e DELETE e os status 200, 404 e 500. Tem desafio prático com Postman e a estreia do quadro Deu ruim em produção.",
+      audio: "https://anchor.fm/s/1180ca0e4/podcast/play/127310848/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-11%2Fc161cf7c-de31-509f-e9df-460b690aa5d7.mp3",
+      link: "https://podcasters.spotify.com/pod/show/gabrielacarvalhozip/episodes/Release-1--Sprint-02-APIs-sem-mistrio-e3qbni0"
+    },
+    {
+      release: 1,
       sprint: 1,
       title: "Hello, World",
       date: "2026-10-07",
@@ -324,9 +334,12 @@ footer p{margin:0;font-size:.92rem;color:var(--ink-soft)}
   audio.addEventListener("timeupdate",function(){if(current<0)return;var c=cards[current];c.range.value=Math.floor(audio.currentTime);c.cur.textContent=fmt(audio.currentTime);paint(c)});
 
   /* Com o site hospedado, busca os episódios novos no feed RSS. Se não conseguir, mostra a lista acima. */
+  /* Busca o feed: primeiro pela função da Vercel (/api/feed), depois direto no Spotify for Creators. */
+  function grab(url){return fetch(url,{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(x){if(x.indexOf("<rss")<0)throw 0;return x})}
+  function getFeed(){return grab("/api/feed?t="+Date.now()).catch(function(){return grab(FEED+"?t="+Date.now())})}
   function fromFeed(){
     if(!window.fetch||!window.DOMParser)return;
-    fetch(FEED).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(xml){
+    getFeed().then(function(xml){
       var NS="http://www.itunes.com/dtds/podcast-1.0.dtd";
       var doc=new DOMParser().parseFromString(xml,"text/xml"),items=doc.getElementsByTagName("item"),list=[];
       for(var i=0;i<items.length;i++){
